@@ -85,6 +85,10 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $task = Task::find($id);
+        if ($task == null) {
+            return redirect("/tasks");
+        }
         if ($request->status === null) {
             $rules = [
                 'task_name' => 'required|max:100',
@@ -95,11 +99,9 @@ class TaskController extends Controller
                 return redirect("/tasks");
             }
             //
-            $task = Task::find($id);
             $task->name = $request->input('task_name');
             $task->save();
         } else {
-            $task = Task::find($id);
             $task->status = true;
             $task->save();
         }
@@ -114,7 +116,11 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        Task::find($id)->delete();
+        $task = Task::find($id);
+        if ($task == null) {
+            return redirect("/tasks");
+        }
+        $task->delete();
         return redirect("/tasks");
     }
 }

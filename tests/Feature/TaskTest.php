@@ -301,7 +301,16 @@ class TaskTest extends TestCase
         $data = array("task_name" => "test task test task test task test task test task test task test task test task test task test taska");
         $response_html = $this->put_pageData_and_check_status($edit_url, $data, "http://localhost/tasks");
         $taskrow_names = ["test task test task test task test task test task test task test task test task test task test taska", "test task2", "test task3"];
-        $this->check_HTML_have_n_taskrow_and_names($response_html, 3, $taskrow_names);    
+        $this->check_HTML_have_n_taskrow_and_names($response_html, 3, $taskrow_names);
+    }
+    // test whether invalid id cannot edit
+    public function test_taskEdit_invalidid_cannot_edit() {
+        $this->init_db();
+        $edit_url = "/tasks/4";
+        $data = array("task_name" => "testtest");
+        $response_html = $this->put_pageData_and_check_status($edit_url, $data, "http://localhost/tasks");
+        $taskrow_names = ["test task1", "test task2", "test task3"];
+        $this->check_HTML_have_n_taskrow_and_names($response_html, 3, $taskrow_names);
     }
 
     // < Done Link from Top Page >
@@ -320,6 +329,15 @@ class TaskTest extends TestCase
         $taskrow_names = ["test task2", "test task3"];
         $this->check_HTML_have_n_taskrow_and_names($response_html, 2, $taskrow_names);
     }
+    // test whether invalid id cannot done
+    public function test_taskListPage_invalidid_cannot_done() {
+        $this->init_db();
+        $invalid_done_url = "/tasks/4";
+        $data = array("status" => 0);
+        $response_html = $this->put_pageData_and_check_status($invalid_done_url, $data, "http://localhost/tasks");
+        $taskrow_names = ["test task1", "test task2", "test task3"];
+        $this->check_HTML_have_n_taskrow_and_names($response_html, 3, $taskrow_names);
+    }
 
     // < Deletion Page >
     // 
@@ -334,5 +352,13 @@ class TaskTest extends TestCase
         $response_html = $this->delete_pageData_and_check_status($delete_url, array(), "http://localhost/tasks");
         $taskrow_names = ["test task2", "test task3"];
         $this->check_HTML_have_n_taskrow_and_names($response_html, 2, $taskrow_names);
+    }
+    // test whether invalid id cannot delete
+    public function test_taskListPage_invalidId_cannot_delete() {
+        $this->init_db();
+        $invalid_url = "/tasks/4";
+        $response_html = $this->delete_pageData_and_check_status($invalid_url, array(), "http://localhost/tasks");
+        $taskrow_names = ["test task1", "test task2", "test task3"];
+        $this->check_HTML_have_n_taskrow_and_names($response_html, 3, $taskrow_names);
     }
 }
