@@ -81,7 +81,7 @@
 				                                      <div class="flex justify-end">
 				                                          <div class="done-area">
 				                                              <form action="/tasks/{{ $item->id }}"
-				                                                  method="post"
+				                                                  method="POST"
 				                                                  class="inline-block text-gray-500 font-medium"
 				                                                  role="menuitem" tabindex="-1">
 				                                                  @csrf
