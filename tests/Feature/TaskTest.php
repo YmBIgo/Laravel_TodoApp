@@ -33,6 +33,8 @@ class TaskTest extends TestCase
         return $dom;
     }
 
+    // check
+
     private function check_HTML_have_n_taskrow_and_names($html, $taskrow_number, $name_array) {
         $tasks_dom = $this->dom($html);
         $taskrows_dom = $tasks_dom->filter(".task-row");
@@ -108,6 +110,32 @@ class TaskTest extends TestCase
         }
         return $task_dones_url;
     }
+
+    private function check_HTML_have_delete_button($html, $ids) {
+        $tasks_dom = $this->dom($html);
+        $taskrows_dom = $tasks_dom->filter(".task-row");
+        $taskrow_texts = $taskrows_dom->each(function(Crawler $node, $i){
+            $delete_button_text = $node->filter("div.delete-area")->eq(0)->text();
+            $delete_button_action = $node->filter("div.delete-area > form")->eq(0)->attr("action");
+            $delete_button_method = $node->filter("div.delete-area > form")->eq(0)->attr("method");
+            $detele_button_method2 = $node->filter("div.delete-area > form > input")->eq(1)->attr("value");
+            return [$delete_button_text, $delete_button_action, $delete_button_method, $detele_button_method2];
+        });
+        $i = 0;
+        $task_deletes_url = array();
+        foreach($taskrow_texts as $taskrow_text) {
+            $expected_url = "/tasks/".$ids[$i];
+            $this->assertSame($taskrow_text[0], "削除");
+            $this->assertSame($taskrow_text[1], $expected_url);
+            $this->assertSame($taskrow_text[2], "POST");
+            $this->assertSame($taskrow_text[3], "DELETE");
+            array_push($task_deletes_url, $taskrow_text[1]);
+            $i += 1;
+        }
+        return $task_deletes_url;
+    }
+
+    // get / post / put / delete methods
 
     private function get_pageData_and_check_status($url) {
         $response = $this->get($url);
@@ -297,4 +325,14 @@ class TaskTest extends TestCase
     // 
     // test whether top page have deletion form 
     // test whether delete page deletion success
+    public function test_taskListPage_have_deletion_button() {
+        $this->init_db();
+        $response_html = $this->get_pageData_and_check_status("/tasks");
+        $ids = [1, 2, 3];
+        $delete_urls = $this->check_HTML_have_delete_button($response_html, $ids);
+        $delete_url = $delete_urls[0];
+        $response_html = $this->delete_pageData_and_check_status($delete_url, array(), "http://localhost/tasks");
+        $taskrow_names = ["test task2", "test task3"];
+        $this->check_HTML_have_n_taskrow_and_names($response_html, 2, $taskrow_names);
+    }
 }

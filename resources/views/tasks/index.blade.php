@@ -97,7 +97,7 @@
 				                                          </div>
 				                                          <div class="delete-area">
 				                                              <form onsubmit="return deleteTask();"
-				                                                  action="/tasks/{{ $item->id }}" method="post"
+				                                                  action="/tasks/{{ $item->id }}" method="POST"
 				                                                  class="inline-block text-gray-500 font-medium"
 				                                                  role="menuitem" tabindex="-1">
 				                                                  @csrf
